@@ -38,7 +38,7 @@
             <div class="card-container d-flex flex-wrap">
                 {% for item in clothing_items %}
                     <div class="card">
-                        <a href="{% url 'core:clothing_item_detail' item.slug %}" class="card-on-catalog">
+                        <a href="{% url "core:clothing_item_detail" item.slug %}" class="card-on-catalog">
                             {% if item.image %}
                                 <img src="{{ item.image.url }}" alt="{{ item.name }}" class="product-image">
                             {% endif %}
