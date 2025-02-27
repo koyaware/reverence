@@ -1,19 +1,20 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate
+from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm, UserLoginForm, UserProfileForm
-# from orders.models import Order
+from django.contrib.auth import logout
+from orders.models import Order
 
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('users:login')
+            return redirect('users:user_login')
     else:
-        form = UserRegisterForm()
+        form = UserRegistrationForm()
 
     return render(request, 'users/register.html', {'form': form})
 
@@ -27,7 +28,9 @@ def user_login(request):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('core:catalog')
+                return redirect('users:profile')
+            else:
+                form.add_error(None, "Invalid email or password.")
     else:
         form = UserLoginForm()
 
@@ -37,6 +40,23 @@ def user_login(request):
 @login_required(login_url='/users/login')
 def user_logout(request):
     logout(request)
-    return redirect('users:login')
+    return redirect('users:user_login')
 
 
+@login_required(login_url='/users/login')
+def profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('users:profile')
+
+    else:
+        form = UserProfileForm(instance=user)
+    orders = Order.objects.filter(user=user)
+
+    return render(request, 'users/profile.html', {
+        'form': form,
+        'orders': orders,
+    })
