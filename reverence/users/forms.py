@@ -6,9 +6,9 @@ from .models import User
 
 
 class UserRegisterForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
+    class Meta:
         model = User
-        fields = ('email', '<PASSWORD1>', '<PASSWORD2>')
+        fields = ('email', 'password1', 'password2')
 
 
     def clean_password1(self):
@@ -25,7 +25,7 @@ class UserRegisterForm(UserCreationForm):
 
 
 class UserLoginForm(AuthenticationForm):
-    class Meta(AuthenticationForm.Meta):
+    class Meta:
         model = User
         fields = ('email', 'password')
 
